@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Validator;
 
 class FormController extends Controller
 {
@@ -30,10 +29,6 @@ class FormController extends Controller
         $name = $request->get('name');
         $email = $request->get('email');
 
-        $validator = Validator::make($request->all(), [
-            'email'=>'required|email'
-        ]);
-
         $temperature = $currentForecast->temperature;
 
         $currentTime = Carbon::now('Europe/Moscow')->format('H:i');
@@ -42,7 +37,7 @@ class FormController extends Controller
 
         $isSendMessage = false;
 
-        if (!$validator->fails()) {
+        if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
             Mail::raw($message, function ($msg) use ($email) {
                 $msg->to($email)->subject("Прогноз погоды в Москве");
             });
